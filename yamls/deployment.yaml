@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: csi-plugin
+  namespace: kube-system
+  labels:
+    app: csi-plugin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: csi-plugin
+  template:
+    metadata:
+      labels:
+        app: csi-plugin
+    spec:
+      containers:
+      - name: external-provisioner
+        image: registry.k8s.io/sig-storage/csi-provisioner:v5.0.0
+        args: 
+          - "--csi-address=$(CSI_ENDPOINT)"
+        env:
+        - name: CSI_ENDPOINT
+          value: "unix:///tmp/csi.sock"
+        volumeMounts:
+        - name: cache
+          mountPath: /tmp
+      - name: csi-plugin
+        image: jokesta/csi-plugin:0.2
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: CSI_ENDPOINT
+          value: "unix:///tmp/csi.sock"
+        volumeMounts:
+        - name: cache
+          mountPath: /tmp
+      volumes:
+      - name: cache
+        emptyDir: {}
