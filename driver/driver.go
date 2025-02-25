@@ -18,10 +18,11 @@ type Driver struct {
 	region   string
 	endpoint string
 
-	srv *grpc.Server
+	srv   *grpc.Server
+	Ready bool
 	csi.UnimplementedNodeServer
 	csi.UnimplementedControllerServer
-	csi.UnimplementedIdentityServer
+	csi.UnsafeIdentityServer
 }
 
 func NewDriver(region, endpoint string) *Driver {
@@ -58,7 +59,7 @@ func (d *Driver) Run() error {
 	csi.RegisterNodeServer(d.srv, d)
 	csi.RegisterControllerServer(d.srv, d)
 	csi.RegisterIdentityServer(d.srv, d)
-
+	d.Ready = true
 	d.srv.Serve(listener)
 	return nil
 }

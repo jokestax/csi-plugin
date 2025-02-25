@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: csi-plugin
-  namespace: kube-system
+  namespace: default
   labels:
     app: csi-plugin
 spec:
@@ -27,7 +27,7 @@ spec:
         - name: cache
           mountPath: /tmp
       - name: csi-plugin
-        image: jokesta/csi-plugin:0.2
+        image: jokesta/csi:0.14
         imagePullPolicy: IfNotPresent
         env:
         - name: CSI_ENDPOINT
@@ -38,3 +38,5 @@ spec:
       volumes:
       - name: cache
         emptyDir: {}
+
+
