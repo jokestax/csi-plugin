@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"os"
 	"path"
 	"path/filepath"
 
+	"github.com/civo/civogo"
 	"github.com/container-storage-interface/spec/lib/go/csi"
 	"google.golang.org/grpc"
 )
@@ -18,18 +20,27 @@ type Driver struct {
 	region   string
 	endpoint string
 
-	srv   *grpc.Server
-	Ready bool
+	srv *grpc.Server
+
+	storage civogo.Client
+	Ready   bool
 	csi.UnimplementedNodeServer
 	csi.UnimplementedControllerServer
 	csi.UnsafeIdentityServer
 }
 
 func NewDriver(region, endpoint string) *Driver {
+
+	apiKey := os.Getenv("API_KEY")
+	client, err := civogo.NewClient(apiKey, "")
+	if err != nil {
+		panic(err)
+	}
 	return &Driver{
 		name:     defaultName,
 		region:   region,
 		endpoint: endpoint,
+		storage:  *client,
 	}
 }
 
@@ -47,6 +58,10 @@ func (d *Driver) Run() error {
 	grpcAddress := path.Join(url.Host, filepath.FromSlash(url.Path))
 	if url.Host == "" {
 		grpcAddress = filepath.FromSlash(url.Path)
+	}
+
+	if err := os.Remove(grpcAddress); err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("removiong listen address %s\n", err.Error())
 	}
 
 	fmt.Println(url.Host, url.Path)

@@ -11,6 +11,7 @@ func main() {
 	var endpoint, token, region string
 	flag.Parse()
 	endpoint = os.Getenv("CSI_ENDPOINT")
+	token = os.Getenv("API_TOKEN")
 	fmt.Println("endpoint:", endpoint)
 	fmt.Println("token:", token)
 	fmt.Println("region:", region)

@@ -5,10 +5,10 @@ metadata:
 rules:
   - apiGroups: [""]
     resources: ["persistentvolumeclaims","persistentvolumes","events"]
-    verbs: ["get","list","update","watch"]
+    verbs: ["get","list","update","watch","create","patch"]
   - apiGroups: ["storage.k8s.io"]
-    resources: ["storageclasses","volumeattachments","volumeattachments/status","csinodes"]
-    verbs: ["get","list","update","watch"]
+    resources: ["storageclasses","volumeattachments","volumeattachments/status","csinodes","patch"]
+    verbs: ["get","list","update","watch","create","patch"]
 ---  
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -21,3 +21,5 @@ subjects:
 roleRef:
   kind: ClusterRole
   name: storage-admin
+
+
